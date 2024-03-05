@@ -12,6 +12,7 @@ import {
 import BookCount from "./components/BookCount";
 import { Ionicons } from "@expo/vector-icons";
 import CustomActionButton from "./components/CustomActionButton";
+import colors from "./assets/color";
 
 class App extends React.Component {
   constructor() {
@@ -83,7 +84,7 @@ class App extends React.Component {
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter the Book Name"
-                placeholderTextColor={"grey"}
+                placeholderTextColor={colors.txtPLaceholder}
                 onChangeText={(text) => {
                   this.setState({ textInputData: text });
                 }}
@@ -98,7 +99,7 @@ class App extends React.Component {
               </CustomActionButton>
               <CustomActionButton
                 style={{
-                  backgroundColor: "#deada5",
+                  backgroundColor: colors.bgError,
                 }}
                 onPress={() => {
                   this.hideAddNewBook;
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
   header: {
     height: 70,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#E9E9E9",
+    borderBottomColor: colors.bgTextInput,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -166,11 +167,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: "#ececec",
+    backgroundColor: colors.bgTextInput,
     padding: 5,
   },
   checkMarkButton: {
-    backgroundColor: "#aedeba",
+    backgroundColor: colors.bgSuccess,
   },
   listEmptyComponent: {
     marginTop: 50,
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#AAD1E6",
+    backgroundColor: colors.bgPrimary,
   },
   addNewBookText: {
     color: "white",
@@ -192,24 +193,24 @@ const styles = StyleSheet.create({
   footer: {
     height: 70,
     borderTopWidth: 0.5,
-    borderTopColor: "#E9E9E9",
+    borderTopColor: colors.bgTextInput,
     flexDirection: "row",
   },
   markAsReadButton: {
     width: 100,
-    backgroundColor: "#aedeba",
+    backgroundColor: colors.bgSuccess,
     alignItems: "center",
     justifyContent: "center",
     height: 50,
   },
   markasReadText: {
     fontWeight: "bold",
-    color: "white",
+    color: colors.white,
   },
   markAsReadContainer: {
     flex: 1,
     justifyContent: "center",
     padding: 5,
-    backgroundColor: "#ececec",
+    backgroundColor: colors.borderColor,
   },
 });
