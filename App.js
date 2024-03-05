@@ -171,27 +171,18 @@ class App extends React.Component {
               </View>
             }
           />
-          <TouchableOpacity
-            onPress={this.showAddNewBook}
+          <CustomActionButton
+            position={"right"}
             style={{
-              position: "absolute",
-              bottom: 20,
-              right: 20,
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              backgroundColor: "#AAD1E6",
             }}
+            onPress={this.showAddNewBook}
           >
-            <View
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 25,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "#AAD1E6",
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 30 }}>+</Text>
-            </View>
-          </TouchableOpacity>
+            <Text style={{ color: "white", fontSize: 30 }}>+</Text>
+          </CustomActionButton>
         </View>
 
         <View
