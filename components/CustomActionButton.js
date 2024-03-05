@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatListComponent } from "react-native";
 import PropTypes from "prop-types"; // ES6
+import colors from "../assets/color";
 
 
 function getPosition(positon) {
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: 50,
-    backgroundColor: "#aedeba",
+    backgroundColor: colors.bgSuccess,
     alignItems: "center",
     justifyContent: "center",
     height: 50,
