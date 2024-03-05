@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import BookCount from "./components/BookCount";
 import { Ionicons } from "@expo/vector-icons";
+import CustomActionButton from "./components/CustomActionButton";
 
 class App extends React.Component {
   constructor() {
@@ -39,8 +40,7 @@ class App extends React.Component {
         books: [...state.books, book],
         totalCount: state.totalCount + 1,
         readingCount: state.readingCount + 1,
-        isAddNewBookVisible:false,
-
+        isAddNewBookVisible: false,
       }),
       () => {
         console.log(this.state.books);
@@ -48,43 +48,46 @@ class App extends React.Component {
     );
   };
 
-  markAsRead=(selectedBook,index)=>{
-    let newList = this.state.books.filter((item)=>item!=selectedBook);
-    this.setState((prevState)=>({
-      books:newList,
-      readCount:prevState.readCount+1,
-      readingCount:prevState.readingCount-1,
-    }))
-
-  }
+  markAsRead = (selectedBook, index) => {
+    let newList = this.state.books.filter((item) => item != selectedBook);
+    this.setState((prevState) => ({
+      books: newList,
+      readCount: prevState.readCount + 1,
+      readingCount: prevState.readingCount - 1,
+    }));
+  };
   renderItem = (item, index) => (
-      <View style={{ height: 50, flexDirection: "row" }}>
-      <View style={{flex:1,justifyContent:'center',padding:5,
-      backgroundColor: "#ececec",
-    }}>
-        <Text>{item}</Text>
-        </View>
-        <TouchableOpacity
-        onPress={() => this.markAsRead(item,index)}
+    <View style={{ height: 50, flexDirection: "row" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          padding: 5,
+          backgroundColor: "#ececec",
+        }}
       >
-        <View
+        <Text>{item}</Text>
+      </View>
+      <CustomActionButton
+        onPress={() => this.markAsRead(item, index)}
+        style={{
+          width: 100,
+          backgroundColor: "#aedeba",
+          alignItems: "center",
+          justifyContent: "center",
+          height: 50,
+        }}
+      >
+        <Text
           style={{
-            width: 100,
-            backgroundColor: "#aedeba",
-            alignItems: "center",
-            justifyContent: "center",
-            height: 50,
+            fontWeight: "bold",
+            color: "white",
           }}
         >
-        <Text style={{
-          fontWeight:'bold',
-          color:'white'
-        }}>
-        Mark as Read.
+          Mark as Read.
         </Text>
-        </View>
-      </TouchableOpacity>
-      </View> 
+      </CustomActionButton>
+    </View>
   );
 
   render() {
@@ -129,34 +132,26 @@ class App extends React.Component {
                   this.setState({ textInputData: text });
                 }}
               />
-              <TouchableOpacity
-                onPress={() => this.addBook(this.state.textInputData)}
+              <CustomActionButton
+                style={{
+                  backgroundColor: "#aedeba",
+                }}
+                onPress={() => {
+                  this.addBook(this.state.textInputData);
+                }}
               >
-                <View
-                  style={{
-                    width: 50,
-                    backgroundColor: "#aedeba",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 50,
-                  }}
-                >
-                  <Ionicons name="checkmark" color={"white"} size={30} />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.hideAddNewBook}>
-                <View
-                  style={{
-                    width: 50,
-                    backgroundColor: "#deada5",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 50,
-                  }}
-                >
-                  <Ionicons name="close" color={"white"} size={30} />
-                </View>
-              </TouchableOpacity>
+                <Ionicons name="checkmark" color={"white"} size={30} />
+              </CustomActionButton>
+              <CustomActionButton
+                style={{
+                  backgroundColor: "#deada5",
+                }}
+                onPress={() => {
+                  this.hideAddNewBook;
+                }}
+              >
+                <Ionicons name="close" color={"white"} size={30} />
+              </CustomActionButton>
             </View>
           )}
 
