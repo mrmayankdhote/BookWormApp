@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, TextInput } from "react-native";
+import { View, Text, StyleSheet, TextInput, ActivityIndicator } from "react-native";
 import colors from "../assets/color";
 import CustomActionButton from "../components/CustomActionButton";
 import * as firebase from "firebase/app";
 import 'firebase/auth';
-import { getAuth, createUserWithEmailAndPassword ,initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword ,initializeAuth, getReactNativePersistence, signInWithEmailAndPassword } from "firebase/auth";
 
 
 export default class LoginScreen extends React.Component {
@@ -17,41 +17,100 @@ export default class LoginScreen extends React.Component {
     };
   }
 
-  onSignIn = () => {};
+  onSignIn = async () => {
+    if (this.state.email && this.state.password) {
+      try {
+        this.setState({
+          isLoading: true,
+        });
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, this.state.email, this.state.password)
+          .then((userCredential) => {
+            // Signed up
+            this.setState({
+              isLoading: false,
+            });
+            alert(JSON.stringify(userCredential));
+            // ...
+          })
+          .catch((error) => {
+            this.setState({
+              isLoading: false,
+            });
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(error);
+            // ..
+          });
+      } catch (error) {
+        this.setState({
+          isLoading: false,
+        });
+        switch (error?.code) {
+          case "auth/user-not-found":
+            alert("A user with that email does not exist.Try signing Up");
+            break;
+          case "auth/invalid-email":
+            alert("Please enter an email address");
+        }
+      }
+    } else {
+      alert("Please enter a email and password");
+    }
+  };
 
   onSignUp = async () => {
     if (this.state.email && this.state.password) {
       try {
-        
-        const auth =  getAuth();
-        createUserWithEmailAndPassword(auth, this.state.email, this.state.password)
+        this.setState({
+          isLoading: true,
+        });
+        const auth = getAuth();
+        createUserWithEmailAndPassword(
+          auth,
+          this.state.email,
+          this.state.password
+        )
           .then((userCredential) => {
-            // Signed up 
+            // Signed up
             const user = userCredential.user;
+            this.setState({
+              isLoading: false,
+            });
+            this.onSignIn(this.state.email && this.state.password);
             // ...
           })
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            alert(error)
+            alert(error);
+            this.setState({
+              isLoading: false,
+            });
             // ..
           });
-
-
       } catch (error) {
-        alert((error))
         if ((error.code = "auth/email-already-in-use")) {
           alert("User already Exists.Try Loggin in");
         }
+        this.setState({
+          isLoading: false,
+        });
       }
-    }else{
-      alert('Please enter a email and password')
+    } else {
+      alert("Please enter a email and password");
     }
   };
 
   render() {
     return (
       <View style={styles.container}>
+        {this.state.isLoading ? <View style ={[StyleSheet.absoluteFill, {
+          justifyContent:'center',
+          alignItems:'center',
+          zIndex:1000,
+          elevation:1000
+        }]}><ActivityIndicator  size={'large'} color={colors.logColor} /></View> : null}
         <View style={{ flex: 1, justifyContent: "center" }}>
           <TextInput
             style={styles.textInput}
