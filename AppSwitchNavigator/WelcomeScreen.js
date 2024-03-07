@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../assets/color";
 import CustomActionButton from "../components/CustomActionButton";
@@ -48,7 +48,7 @@ export default class WelcomeScreen extends React.Component {
               marginBottom:10,
 
             }}
-            onPress={() => this.props.navigation.navigate('HomeScreen')}
+            onPress={() => this.props.navigation.navigate('LoginStack')}
           >
             <Text
               style={{
@@ -60,14 +60,14 @@ export default class WelcomeScreen extends React.Component {
             </Text>
           </CustomActionButton>
           <CustomActionButton
-            title="SignUp"
+            title="LoginScreen"
             style={{
               width: 200,
               backgroundColor: "transparent",
               borderWidth: 0.5,
               borderColor: colors.bgError,
             }}
-            onPress={() => this.props.navigation.navigate('SignUpScreen')}
+            onPress={() => this.props.navigation.navigate('LoginScreen')}
           >
             <Text
               style={{

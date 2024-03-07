@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "./AppSwitchNavigator/WelcomeScreen";
-import SignUpScreen from "./screens/SignUpScreen";
+import LoginScreen from "./screens/LoginScreen";
 import colors from "./assets/color";
 import HomeScreen from "./screens/HomeScreen";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -77,8 +77,8 @@ export default class BookWorm extends React.Component {
             }}
           />
           <Stack.Screen
-            name="SignUpScreen"
-            component={SignUpScreen}
+            name="LoginScreen"
+            component={LoginScreen}
             options={{ headerShown: true }}
           />
           <Stack.Screen
