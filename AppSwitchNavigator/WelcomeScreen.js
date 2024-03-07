@@ -38,7 +38,7 @@ export default class WelcomeScreen extends React.Component {
             alignItems:'center'
           }}
         >
-          <CustomActionButton
+          {/* <CustomActionButton
             title="Login In"
             style={{
               width: 200,
@@ -58,7 +58,7 @@ export default class WelcomeScreen extends React.Component {
             >
               Login In
             </Text>
-          </CustomActionButton>
+          </CustomActionButton> */}
           <CustomActionButton
             title="LoginScreen"
             style={{
@@ -76,7 +76,7 @@ export default class WelcomeScreen extends React.Component {
 
               }}
             >
-              SignUp{" "}
+              Login{" "}
             </Text>
           </CustomActionButton>
         </View>

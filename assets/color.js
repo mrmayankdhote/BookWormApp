@@ -8,6 +8,7 @@ const colors = {
     white:'white',
     logColor:'#bada55',
     bgMain:'#2E424D',
+    bgTextInputDark:'#b6b6b6'
 }
 
 export default colors;

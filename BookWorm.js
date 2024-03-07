@@ -60,12 +60,15 @@ export default class BookWorm extends React.Component {
     return (
       <NavigationContainer>
         <Stack.Navigator
+        
           screenOptions={{
+
             headerStyle: {
               backgroundColor: colors.bgMain,
             },
             headerBackTitleVisible: false,
             headerTintColor: colors.white,
+            presentation:'modal'
           }}
         >
           <Stack.Screen
@@ -79,7 +82,11 @@ export default class BookWorm extends React.Component {
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}
-            options={{ headerShown: true }}
+            options={{
+               headerShown: true,
+               headerBackTitle:'Login' 
+            
+             }}
           />
           <Stack.Screen
             name="LoginStack"
