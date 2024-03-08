@@ -23,6 +23,8 @@ class HomeScreen extends React.Component {
       isAddNewBookVisible: false,
       textInputData: "",
       books: [],
+      booksReading:[],
+      booksRead:[],
     };
   }
 
@@ -38,6 +40,9 @@ class HomeScreen extends React.Component {
     this.setState(
       (state, props) => ({
         books: [...state.books, book],
+        booksReading:[...state.booksReading, book],
+        // booksRead:[],
+  
         totalCount: state.totalCount + 1,
         readingCount: state.readingCount + 1,
         isAddNewBookVisible: false,
@@ -50,10 +55,15 @@ class HomeScreen extends React.Component {
 
   markAsRead = (selectedBook, index) => {
     let newList = this.state.books.filter((item) => item != selectedBook);
+    let newBooksReadingList = this.state.booksReading.filter((item) => item != selectedBook);
+
     this.setState((prevState) => ({
       books: newList,
-      readCount: prevState.readCount + 1,
-      readingCount: prevState.readingCount - 1,
+      booksReading:newBooksReadingList,
+      booksRead:[...prevState.booksRead,selectedBook],
+      // readCount: prevState.readCount + 1,
+      // readingCount: prevState.readingCount - 1,
+
     }));
   };
   renderItem = (item, index) => (
@@ -131,9 +141,9 @@ class HomeScreen extends React.Component {
         </View>
 
         <View style={styles.footer}>
-          <BookCount title={"Total"} count={this.state.totalCount} />
-          <BookCount title={"Reading"} count={this.state.readingCount} />
-          <BookCount title={"Read"} count={this.state.readCount} />
+          <BookCount title={"Total Books"} count={this.state.totalCount} />
+          <BookCount title={"Reading"} count={this.state?.booksReading?.length} />
+          <BookCount title={"Read"} count={this.state.booksRead?.length} />
         </View>
         <SafeAreaView />
 
