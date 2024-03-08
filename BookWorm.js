@@ -11,7 +11,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import SettingScreen from "./AppSwitchNavigator/SettingScreen";
 import CustomDrawerCompoenent from "./DrawerNavigator/CustomDrawerCompoenent";
-
+import LoadingScreen from "./screens/LoadingScreen";
 export default class BookWorm extends React.Component {
   render() {
     const Stack = createStackNavigator();
@@ -60,17 +60,22 @@ export default class BookWorm extends React.Component {
     return (
       <NavigationContainer>
         <Stack.Navigator
-        
           screenOptions={{
-
             headerStyle: {
               backgroundColor: colors.bgMain,
             },
             headerBackTitleVisible: false,
             headerTintColor: colors.white,
-            presentation:'modal'
           }}
         >
+          <Stack.Screen
+            name="LoadingScreen"
+            component={LoadingScreen}
+            options={{ headerShown: false }}
+            screenOptions={{
+              headerTitle: null,
+            }}
+          />
           <Stack.Screen
             name="WelcomeScreen"
             component={WelcomeScreen}
@@ -79,14 +84,14 @@ export default class BookWorm extends React.Component {
               headerTitle: null,
             }}
           />
+
           <Stack.Screen
             name="LoginScreen"
             component={LoginScreen}
             options={{
-               headerShown: true,
-               headerBackTitle:'Login' 
-            
-             }}
+              headerShown: true,
+              headerBackTitle: "Login",
+            }}
           />
           <Stack.Screen
             name="LoginStack"
