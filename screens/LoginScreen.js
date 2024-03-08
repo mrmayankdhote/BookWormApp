@@ -1,11 +1,24 @@
 import React from "react";
-import { View, Text, StyleSheet, TextInput, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import colors from "../assets/color";
 import CustomActionButton from "../components/CustomActionButton";
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import { getAuth, createUserWithEmailAndPassword ,initializeAuth, getReactNativePersistence, signInWithEmailAndPassword } from "firebase/auth";
+import "firebase/auth";
+import "firebase/database";
 
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  initializeAuth,
+  getReactNativePersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { getDatabase, ref, set } from "firebase/database";
 
 export default class LoginScreen extends React.Component {
   constructor() {
@@ -31,6 +44,7 @@ export default class LoginScreen extends React.Component {
               isLoading: false,
             });
             alert(JSON.stringify(userCredential));
+
             // ...
           })
           .catch((error) => {
@@ -71,19 +85,24 @@ export default class LoginScreen extends React.Component {
           this.state.email,
           this.state.password
         )
-          .then((userCredential) => {
+          .then((response) => {
             // Signed up
-            const user = userCredential.user;
             this.setState({
               isLoading: false,
             });
-            this.onSignIn(this.state.email && this.state.password);
+            // this.onSignIn(this.state.email && this.state.password);
+            const db = getDatabase();
+
+            set(ref(db, "users/" + response.user.uid), {
+              email: response.user.email,
+              uid: response.user.uid,
+            });
+
             // ...
           })
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            alert(error);
             this.setState({
               isLoading: false,
             });
@@ -105,12 +124,21 @@ export default class LoginScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.isLoading ? <View style ={[StyleSheet.absoluteFill, {
-          justifyContent:'center',
-          alignItems:'center',
-          zIndex:1000,
-          elevation:1000
-        }]}><ActivityIndicator  size={'large'} color={colors.logColor} /></View> : null}
+        {this.state.isLoading ? (
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 1000,
+                elevation: 1000,
+              },
+            ]}
+          >
+            <ActivityIndicator size={"large"} color={colors.logColor} />
+          </View>
+        ) : null}
         <View style={{ flex: 1, justifyContent: "center" }}>
           <TextInput
             style={styles.textInput}

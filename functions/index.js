@@ -15,17 +15,17 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-exports.createUserInDatabase = functions.auth.user().onCreate(async (user) => {
-  const email = user.email;
-  try {
-    const snapShot = await admin
-      .database()
-      .ref("users/" + user.uid)
-      .set({
-        email: email,
-        uid: user.uid,
-      });
+// exports.createUserInDatabase = functions.auth.user().onCreate(async (user) => {
+//   const email = user.email;
+//   try {
+//     const snapShot = await admin
+//       .database()
+//       .ref("users/" + user.uid)
+//       .set({
+//         email: email,
+//         uid: user.uid,
+//       });
 
-    return snapShot;
-  } catch (e) {}
-});
+//     return snapShot;
+//   } catch (e) {}
+// });
