@@ -12,6 +12,8 @@ import BookCount from "../components/BookCount";
 import { Ionicons } from "@expo/vector-icons";
 import CustomActionButton from "../components/CustomActionButton";
 import colors from "../assets/color";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getDatabase, ref, get,setKey, set, child, push, query, orderByChild, equalTo } from "firebase/database";
 
 class HomeScreen extends React.Component {
   constructor() {
@@ -23,10 +25,41 @@ class HomeScreen extends React.Component {
       isAddNewBookVisible: false,
       textInputData: "",
       books: [],
-      booksReading:[],
-      booksRead:[],
+      booksReading: [],
+      booksRead: [],
+      currentUser: [],
     };
   }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("user");
+
+      if (value !== null) {
+        return JSON.parse(value);
+      } else {
+        return {};
+      }
+    } catch (error) {
+      alert(error);
+      // Error retrieving data
+    }
+  };
+  componentDidMount = async () => {
+    const { navigation } = this.props;
+    const user = await this._retrieveData();
+    const db = getDatabase();
+    try {
+      const currentUser = await get(ref(db, "users/" + user?.uid));
+      if (currentUser.toJSON()) {
+        this.setState((prevState) => ({
+          currentUser: currentUser.toJSON(),
+        }));
+      }
+    } catch (e) {
+      alert(e);
+    }
+  };
 
   showAddNewBook = () => {
     this.setState({ isAddNewBookVisible: true });
@@ -36,34 +69,80 @@ class HomeScreen extends React.Component {
     this.setState({ isAddNewBookVisible: false });
   };
 
-  addBook = (book) => {
-    this.setState(
-      (state, props) => ({
-        books: [...state.books, book],
-        booksReading:[...state.booksReading, book],
-        // booksRead:[],
-  
-        totalCount: state.totalCount + 1,
-        readingCount: state.readingCount + 1,
-        isAddNewBookVisible: false,
-      }),
-      () => {
-        console.log(this.state.books);
+  getData = async (book) => {
+    try {
+      const db = getDatabase();
+
+      const readNewLogEntries = await get(
+        query(
+          ref(db, "Book/" + this?.state?.currentUser?.uid),
+          orderByChild("name"),
+          equalTo(book)
+        )
+      );
+      if (readNewLogEntries.val() != null) {
+        return true;
+      } else {
+        return false;
       }
-    );
+    } catch (e) {
+      alert(e);
+      return false;
+    }
+  };
+
+  addBook = async (book) => {
+    const isBookAlreadyExist = await this.getData(book);
+    if (isBookAlreadyExist) {
+      alert("Unable to add as book already exists");
+    } else {
+      try {
+        const db = getDatabase();
+        const BookListRef = ref(db, "Book/" + this.state.currentUser.uid);
+        const newBookRef = push(BookListRef);
+        set(
+          newBookRef,
+          {
+            name: book,
+            read: false,
+          },
+          {
+            onlyOnce: true,
+          }
+        );
+
+        this.setState(
+          (state, props) => ({
+            books: [...state.books, book],
+            booksReading: [...state.booksReading, book],
+            // booksRead:[],
+
+            totalCount: state.totalCount + 1,
+            readingCount: state.readingCount + 1,
+            isAddNewBookVisible: false,
+          }),
+          () => {
+            console.log(this.state.books);
+          }
+        );
+      } catch (e) {
+        alert(e);
+      }
+    }
   };
 
   markAsRead = (selectedBook, index) => {
     let newList = this.state.books.filter((item) => item != selectedBook);
-    let newBooksReadingList = this.state.booksReading.filter((item) => item != selectedBook);
+    let newBooksReadingList = this.state.booksReading.filter(
+      (item) => item != selectedBook
+    );
 
     this.setState((prevState) => ({
       books: newList,
-      booksReading:newBooksReadingList,
-      booksRead:[...prevState.booksRead,selectedBook],
+      booksReading: newBooksReadingList,
+      booksRead: [...prevState.booksRead, selectedBook],
       // readCount: prevState.readCount + 1,
       // readingCount: prevState.readingCount - 1,
-
     }));
   };
   renderItem = (item, index) => (
@@ -142,7 +221,10 @@ class HomeScreen extends React.Component {
 
         <View style={styles.footer}>
           <BookCount title={"Total Books"} count={this.state.totalCount} />
-          <BookCount title={"Reading"} count={this.state?.booksReading?.length} />
+          <BookCount
+            title={"Reading"}
+            count={this.state?.booksReading?.length}
+          />
           <BookCount title={"Read"} count={this.state.booksRead?.length} />
         </View>
         <SafeAreaView />
