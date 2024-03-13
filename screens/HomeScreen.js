@@ -13,7 +13,9 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomActionButton from "../components/CustomActionButton";
 import colors from "../assets/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getDatabase, ref, get,setKey, set, child, push, query, orderByChild, equalTo } from "firebase/database";
+import { getDatabase, ref, get,setKey, set, child, push, query, orderByChild, equalTo, update } from "firebase/database";
+import { snapshotToArray } from "../helpers/firebaseHelpers";
+import { bool } from "prop-types";
 
 class HomeScreen extends React.Component {
   constructor() {
@@ -51,9 +53,14 @@ class HomeScreen extends React.Component {
     const db = getDatabase();
     try {
       const currentUser = await get(ref(db, "users/" + user?.uid));
+      const BookListRef = await get(ref(db, "Book/" + user?.uid));
+      const Books = snapshotToArray(BookListRef);
       if (currentUser.toJSON()) {
         this.setState((prevState) => ({
           currentUser: currentUser.toJSON(),
+          books: Books,
+          booksRead: Books.filter((item) => item.read == true),
+          booksReading: Books.filter((item) => item.read == false),
         }));
       }
     } catch (e) {
@@ -113,8 +120,8 @@ class HomeScreen extends React.Component {
 
         this.setState(
           (state, props) => ({
-            books: [...state.books, book],
-            booksReading: [...state.booksReading, book],
+            books: [...state.books, { name: book, read: false }],
+            booksReading: [...state.booksReading, { name: book, read: false }],
             // booksRead:[],
 
             totalCount: state.totalCount + 1,
@@ -131,31 +138,55 @@ class HomeScreen extends React.Component {
     }
   };
 
-  markAsRead = (selectedBook, index) => {
-    let newList = this.state.books.filter((item) => item != selectedBook);
-    let newBooksReadingList = this.state.booksReading.filter(
-      (item) => item != selectedBook
-    );
+  markAsRead = async (selectedBook, index) => {
 
+    try {
+      const dbRef = ref(getDatabase());
+      const updates = {};
+      updates[
+        `Book/${this.state.currentUser?.uid}/${selectedBook?.key}/read`
+      ] = true;
+      await update(dbRef, updates);
+    } catch (e) {
+      console.log("markAsRead method error" + e);
+    }
+
+    let newList = this.state.books.map((book) => {
+      if (book.name == selectedBook.name) {
+        return { ...book, read: true };
+      } else return book;
+    });
+
+    let newBooksReadingList = this.state.booksReading.filter(
+      (book) => book.name != selectedBook.name
+    );
+  
     this.setState((prevState) => ({
       books: newList,
       booksReading: newBooksReadingList,
-      booksRead: [...prevState.booksRead, selectedBook],
+      booksRead: [
+        ...prevState.booksRead,
+        { name: selectedBook.name, read: true },
+      ],
       // readCount: prevState.readCount + 1,
       // readingCount: prevState.readingCount - 1,
     }));
   };
   renderItem = (item, index) => (
-    <View style={{ height: 50, flexDirection: "row" }}>
+    <View style={{  flexDirection: "row",backgroundColor:colors.listItemBg ,minHeight: 100,alignItems:'center',marginVertical:5}}>
       <View style={styles.markAsReadContainer}>
-        <Text>{item}</Text>
+        <Text style={styles.listItemTitle}>{item.name}</Text>
       </View>
-      <CustomActionButton
-        onPress={() => this.markAsRead(item, index)}
-        style={styles.markAsReadButton}
-      >
-        <Text style={styles.markasReadText}>Mark as Read.</Text>
-      </CustomActionButton>
+      {item.read==true ? (
+        <Ionicons name="checkmark" color={colors.logColor} size={30} />
+      ) : (
+        <CustomActionButton
+          onPress={() => this.markAsRead(item, index)}
+          style={styles.markAsReadButton}
+        >
+          <Text style={styles.markasReadText}>Mark as Read.</Text>
+        </CustomActionButton>
+      )}
     </View>
   );
 
@@ -197,7 +228,6 @@ class HomeScreen extends React.Component {
               </CustomActionButton>
             </View>
           )}
-
           <FlatList
             data={this.state.books}
             renderItem={({ item, index }) => this.renderItem(item, index)}
@@ -220,7 +250,7 @@ class HomeScreen extends React.Component {
         </View>
 
         <View style={styles.footer}>
-          <BookCount title={"Total Books"} count={this.state.totalCount} />
+          <BookCount title={"Total Books"} count={this.state.books?.length} />
           <BookCount
             title={"Reading"}
             count={this.state?.booksReading?.length}
@@ -241,6 +271,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: "center",
     justifyContent: "center",
+    backgroundColor:colors.bgMain
   },
   header: {
     height: 70,
@@ -288,6 +319,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   markAsReadButton: {
+    borderRadius: 0,
     width: 100,
     backgroundColor: colors.bgSuccess,
     alignItems: "center",
@@ -302,6 +334,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 5,
-    backgroundColor: colors.borderColor,
+  },
+  listItemTitle: {
+    fontWeight: "100",
+    fontSize: 22,
+    color: colors.white,
   },
 });
