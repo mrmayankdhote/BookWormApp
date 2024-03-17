@@ -7,9 +7,9 @@ import colors from "../assets/color";
 function getPosition(positon) {
   switch (positon) {
     case "left":
-      return { position: "absolute", bottom: 20, left: 20 };
+      return { position: "absolute", bottom: 270, left: 20 };
     default: {
-      return { position: "absolute", bottom: 20, right: 20 };
+      return { position: "absolute", bottom: 270, right: 20 };
     }
   }
 }

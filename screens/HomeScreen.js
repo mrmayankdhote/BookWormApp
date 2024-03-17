@@ -2,6 +2,7 @@ import React from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
+  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -16,6 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getDatabase, ref, get,setKey, set, child, push, query, orderByChild, equalTo, update } from "firebase/database";
 import { snapshotToArray } from "../helpers/firebaseHelpers";
 import { bool } from "prop-types";
+import ListItem from "../components/ListItem";
+import * as Animatable from 'react-native-animatable'
 
 class HomeScreen extends React.Component {
   constructor() {
@@ -31,6 +34,7 @@ class HomeScreen extends React.Component {
       booksRead: [],
       currentUser: [],
     };
+    this.textInputRef=null;
   }
 
   _retrieveData = async () => {
@@ -99,6 +103,10 @@ class HomeScreen extends React.Component {
   };
 
   addBook = async (book) => {
+    this.setState({
+      textInput:''
+    })
+    this. textInputRef.setNativeProps({text: ""});
     const isBookAlreadyExist = await this.getData(book);
     if (isBookAlreadyExist) {
       alert("Unable to add as book already exists");
@@ -139,7 +147,6 @@ class HomeScreen extends React.Component {
   };
 
   markAsRead = async (selectedBook, index) => {
-
     try {
       const dbRef = ref(getDatabase());
       const updates = {};
@@ -160,7 +167,7 @@ class HomeScreen extends React.Component {
     let newBooksReadingList = this.state.booksReading.filter(
       (book) => book.name != selectedBook.name
     );
-  
+
     this.setState((prevState) => ({
       books: newList,
       booksReading: newBooksReadingList,
@@ -173,11 +180,26 @@ class HomeScreen extends React.Component {
     }));
   };
   renderItem = (item, index) => (
-    <View style={{  flexDirection: "row",backgroundColor:colors.listItemBg ,minHeight: 100,alignItems:'center',marginVertical:5}}>
-      <View style={styles.markAsReadContainer}>
-        <Text style={styles.listItemTitle}>{item.name}</Text>
-      </View>
-      {item.read==true ? (
+    // <View style={{  flexDirection: "row",backgroundColor:colors.listItemBg ,minHeight: 100,alignItems:'center',marginVertical:5}}>
+    // <View style={styles.imageContainer}>
+    // <Image source={require('../assets/icon.png')}  style={styles.image} />
+    // </View>
+    // <View style={styles.markAsReadContainer}>
+    //     <Text style={styles.listItemTitle}>{item.name}</Text>
+    //   </View>
+    //   {item.read==true ? (
+    //     <Ionicons name="checkmark" color={colors.logColor} size={30} />
+    //   ) : (
+    //     <CustomActionButton
+    //       onPress={() => this.markAsRead(item, index)}
+    //       style={styles.markAsReadButton}
+    //     >
+    //       <Text style={styles.markasReadText}>Mark as Read.</Text>
+    //     </CustomActionButton>
+    //   )}
+    // </View>
+    <ListItem item={item}>
+      {item.read == true ? (
         <Ionicons name="checkmark" color={colors.logColor} size={30} />
       ) : (
         <CustomActionButton
@@ -187,7 +209,7 @@ class HomeScreen extends React.Component {
           <Text style={styles.markasReadText}>Mark as Read.</Text>
         </CustomActionButton>
       )}
-    </View>
+    </ListItem>
   );
 
   render() {
@@ -198,7 +220,7 @@ class HomeScreen extends React.Component {
           <Text style={styles.headerTitle}> Book Worm</Text>
         </View>
         <View style={styles.container}>
-          {this.state.isAddNewBookVisible && (
+          {/* {this.state.isAddNewBookVisible && (
             <View style={styles.textInputContainer}>
               <TextInput
                 style={styles.textInput}
@@ -227,7 +249,18 @@ class HomeScreen extends React.Component {
                 <Ionicons name="close" color={"white"} size={30} />
               </CustomActionButton>
             </View>
-          )}
+          )} */}
+          <View style={styles.textInputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter the Book Name"
+              placeholderTextColor={colors.txtPLaceholder}
+              onChangeText={(text) => {
+                this.setState({ textInputData: text });
+              }}
+
+              ref={component => {this.textInputRef= component}}            />
+          </View>
           <FlatList
             data={this.state.books}
             renderItem={({ item, index }) => this.renderItem(item, index)}
@@ -240,13 +273,23 @@ class HomeScreen extends React.Component {
               </View>
             }
           />
-          <CustomActionButton
-            position={"right"}
-            style={styles.addNewBookButton}
-            onPress={this.showAddNewBook}
+          <Animatable.View
+            animation={
+              this.state.textInputData.length > 0
+                ? "slideInRight"
+                : "slideOutRight"
+            }
           >
-            <Text style={styles.addNewBookText}>+</Text>
-          </CustomActionButton>
+            <CustomActionButton
+              position={"right"}
+              style={styles.addNewBookButton}
+              onPress={()=>{
+                this.addBook(this.state.textInputData);
+                }}
+            >
+              <Text style={styles.addNewBookText}>+</Text>
+            </CustomActionButton>
+          </Animatable.View>
         </View>
 
         <View style={styles.footer}>
@@ -271,7 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: "center",
     justifyContent: "center",
-    backgroundColor:colors.bgMain
+    backgroundColor: colors.bgMain,
   },
   header: {
     height: 70,
@@ -286,11 +329,18 @@ const styles = StyleSheet.create({
   textInputContainer: {
     height: 50,
     flexDirection: "row",
+    margin:5
   },
   textInput: {
     flex: 1,
-    backgroundColor: colors.bgTextInput,
-    padding: 5,
+    backgroundColor: 'transparent',
+    paddingLeft:5,
+    borderColor:colors.listItemBg,
+    borderBottomWidth:5,
+    fontSize:22,
+    fontWeight:'200',
+    color:colors.white
+
   },
   checkMarkButton: {
     backgroundColor: colors.bgSuccess,
@@ -328,16 +378,6 @@ const styles = StyleSheet.create({
   },
   markasReadText: {
     fontWeight: "bold",
-    color: colors.white,
-  },
-  markAsReadContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 5,
-  },
-  listItemTitle: {
-    fontWeight: "100",
-    fontSize: 22,
     color: colors.white,
   },
 });
