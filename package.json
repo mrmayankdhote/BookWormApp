@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.22.3",
+    "@react-navigation/bottom-tabs": "^6.5.19",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
@@ -21,6 +22,7 @@
     "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-native": "0.73.4",
+    "react-native-animatable": "^1.4.0",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-reanimated": "~3.6.2"
   },
