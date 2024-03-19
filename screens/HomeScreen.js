@@ -216,9 +216,9 @@ class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
         <SafeAreaView />
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}> Book Worm</Text>
-        </View>
+        {/* <View style={styles.header}> */}
+          {/* <Text style={styles.headerTitle}> Book Worm</Text> */}
+        {/* </View> */}
         <View style={styles.container}>
           {/* {this.state.isAddNewBookVisible && (
             <View style={styles.textInputContainer}>
@@ -292,14 +292,14 @@ class HomeScreen extends React.Component {
           </Animatable.View>
         </View>
 
-        <View style={styles.footer}>
+        {/* <View style={styles.footer}>
           <BookCount title={"Total Books"} count={this.state.books?.length} />
           <BookCount
             title={"Reading"}
             count={this.state?.booksReading?.length}
           />
           <BookCount title={"Read"} count={this.state.booksRead?.length} />
-        </View>
+        </View> */}
         <SafeAreaView />
 
         <StatusBar style="auto" />

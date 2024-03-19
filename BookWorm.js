@@ -2,43 +2,108 @@ import "react-native-gesture-handler";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, createB } from "@react-navigation/stack";
 import WelcomeScreen from "./AppSwitchNavigator/WelcomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import colors from "./assets/color";
 import HomeScreen from "./screens/HomeScreen";
+import BooksReadScreen from "./screens/HomeTabNavigator/BooksReadScreen";
+import BooksReading from "./screens/HomeTabNavigator/BooksReadingScreen";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import SettingScreen from "./AppSwitchNavigator/SettingScreen";
-import CustomDrawerCompoenent from "./DrawerNavigator/CustomDrawerCompoenent";
+import CustomDrawerCompoenent from "./screens/DrawerNavigator/CustomDrawerCompoenent";
 import LoadingScreen from "./screens/LoadingScreen";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 export default class BookWorm extends React.Component {
   render() {
     const Stack = createStackNavigator();
 
     const Drawer = createDrawerNavigator();
 
+    const HomeTabNavigator = createBottomTabNavigator();
+
+    function HomeTab() {
+      return (
+        <HomeTabNavigator.Navigator
+          screenOptions={{
+            tabBarStyle: { backgroundColor:colors.bgMain },
+            tabBarActiveTintColor:colors.logColor,
+            tabBarInactiveTintColor:colors.bgTextInput
+
+          }}
+        >
+          <HomeTabNavigator.Screen
+            name="HomeScreen"
+            component={HomeScreen}
+            options={{
+              title:"Total Books",
+              tabBarLabel: "Total Books",
+              headerShown: false,
+            }}
+          />
+
+          <HomeTabNavigator.Screen
+            name="BooksReadScreen"
+            component={BooksReadScreen}
+            options={{
+              tabBarLabel: "Books Read",
+              headerShown: false,
+            }}
+          />
+
+          <HomeTabNavigator.Screen
+            name="BooksReading"
+            component={BooksReading}
+            options={{
+
+              tabBarLabel: "Books Reading",
+              headerShown: false,
+            }}
+          />
+        </HomeTabNavigator.Navigator>
+      );
+    }
+
+    Drawer.screenOptions = ({ navigation }) => {
+      alert(true);
+      // const { routeName } = navigation.state.routes[navigation.state.index]
+      const { routeName } = navigation.state.routes[navigation.state.index];
+      alert(routeName);
+    };    
+
     function LoginStack() {
       return (
-        
-        <Drawer.Navigator drawerContent={(props) => <CustomDrawerCompoenent {...props} />}>
-        <Drawer.Screen
+        <Drawer.Navigator
+          drawerContent={(props) => <CustomDrawerCompoenent {...props} />}
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: colors.bgMain,
+            },
+            headerTintColor: colors.white,
+          }}
+        >
+          <Drawer.Screen
             name="HomeScreen"
+            
             options={{
-              title: "Home",
-              headerShown:false,
-
-              drawerStyle: {
-                backgroundColor: "#red",
-                width: 240,
-                headerShown:false
-              },
+              title: "Book Worm",
               drawerIcon: ({ color, size }) => (
                 <Ionicons name="home" size={24} color={colors.bgMain} />
               ),
             }}
-            component={HomeScreen}
+            component={HomeTab}
           />
+
+          {/* <Drawer.Screen
+            name="HomeTabNavigator"
+            component={HomeTab}
+            options={{
+              headerShown: false,
+              headerTitle
+            }}
+          /> */}
+
           <Drawer.Screen
             name="SettingScreen"
             options={{
@@ -48,7 +113,7 @@ export default class BookWorm extends React.Component {
                 width: 240,
               },
               drawerIcon: ({ color, size }) => (
-                <Ionicons name='settings' size={24} color={colors.bgMain} />
+                <Ionicons name="settings" size={24} color={colors.bgMain} />
               ),
             }}
             component={SettingScreen}

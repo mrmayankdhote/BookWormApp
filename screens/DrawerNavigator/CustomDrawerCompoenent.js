@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, ScrollView, SafeAreaView, Text } from "react-native";
-import colors from "../assets/color";
+import colors from "../../assets/color";
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerContentScrollView, DrawerItemList } from "@react-navigation/drawer";
 
