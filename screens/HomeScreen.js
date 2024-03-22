@@ -19,6 +19,7 @@ import { snapshotToArray } from "../helpers/firebaseHelpers";
 import { bool } from "prop-types";
 import ListItem from "../components/ListItem";
 import * as Animatable from 'react-native-animatable'
+import { connect } from "react-redux";
 
 class HomeScreen extends React.Component {
   constructor() {
@@ -62,10 +63,12 @@ class HomeScreen extends React.Component {
       if (currentUser.toJSON()) {
         this.setState((prevState) => ({
           currentUser: currentUser.toJSON(),
-          books: Books,
-          booksRead: Books.filter((item) => item.read == true),
-          booksReading: Books.filter((item) => item.read == false),
+          // books: Books,
+          // booksRead: Books.filter((item) => item.read == true),
+          // booksReading: Books.filter((item) => item.read == false),
         }));
+        this.props.loadBooks(Books.reverse())
+        console.log(this.props.books)
       }
     } catch (e) {
       alert(e);
@@ -126,21 +129,24 @@ class HomeScreen extends React.Component {
           }
         );
 
-        this.setState(
-          (state, props) => ({
-            books: [...state.books, { name: book, read: false }],
-            booksReading: [...state.booksReading, { name: book, read: false }],
-            // booksRead:[],
+        // this.setState(
+        //   (state, props) => ({
+        //     books: [...state.books, { name: book, read: false }],
+        //     booksReading: [...state.booksReading, { name: book, read: false }],
+        //     // booksRead:[],
 
-            totalCount: state.totalCount + 1,
-            readingCount: state.readingCount + 1,
-            isAddNewBookVisible: false,
-          }),
-          () => {
-            console.log(this.state.books);
-          }
-        );
-      } catch (e) {
+        //     totalCount: state.totalCount + 1,
+        //     readingCount: state.readingCount + 1,
+        //     isAddNewBookVisible: false,
+        //   }),
+        //   () => {
+        //     console.log(this.state.books);
+        //   }
+        // );
+
+         this.props.addBook({name:book,read: false})
+
+} catch (e) {
         alert(e);
       }
     }
@@ -168,16 +174,19 @@ class HomeScreen extends React.Component {
       (book) => book.name != selectedBook.name
     );
 
-    this.setState((prevState) => ({
-      books: newList,
-      booksReading: newBooksReadingList,
-      booksRead: [
-        ...prevState.booksRead,
-        { name: selectedBook.name, read: true },
-      ],
-      // readCount: prevState.readCount + 1,
-      // readingCount: prevState.readingCount - 1,
-    }));
+    // this.setState((prevState) => ({
+    //   books: newList,
+    //   booksReading: newBooksReadingList,
+    //   booksRead: [
+    //     ...prevState.booksRead,
+    //     { name: selectedBook.name, read: true },
+    //   ],
+    //   // readCount: prevState.readCount + 1,
+    //   // readingCount: prevState.readingCount - 1,
+    // }));
+    this.props.markBookAsRead(selectedBook)
+
+    
   };
   renderItem = (item, index) => (
     // <View style={{  flexDirection: "row",backgroundColor:colors.listItemBg ,minHeight: 100,alignItems:'center',marginVertical:5}}>
@@ -262,8 +271,8 @@ class HomeScreen extends React.Component {
               ref={component => {this.textInputRef= component}}            />
           </View>
           <FlatList
-            data={this.state.books}
-            renderItem={({ item, index }) => this.renderItem(item, index)}
+        data={this.props.books.books}    
+        renderItem={({ item, index }) => this.renderItem(item, index)}
             keyExtractor={(item, index) => index.toString()}
             ListEmptyComponent={
               <View style={styles.listEmptyComponent}>
@@ -307,7 +316,27 @@ class HomeScreen extends React.Component {
     );
   }
 }
-export default HomeScreen;
+
+const mapStateToProps = state => {
+  return {
+  books: state.books
+  }
+}
+
+  
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadBooks: (books) =>
+      dispatch({ type: "LOAD_BOOKS_FROM_SERVER", payload: books }),
+      addBook: (books) =>
+      dispatch({ type: "ADD_BOOK", payload: books }),
+      markBookAsRead: (book) =>
+      dispatch({ type: "MARK_BOOK_AS_READ", payload: book }),
+
+  };
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
