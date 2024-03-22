@@ -2,6 +2,7 @@ const initialState = {
   books: [],
   booksReading: [],
   booksRead: [],
+  isLoadingBooks:true,
 };
 
 const booksReducers = (state = initialState, action) => {
@@ -36,6 +37,12 @@ const booksReducers = (state = initialState, action) => {
           (book) => book.name !== action.payload.name
         ),
       };
+      case "TOGGLE_IS_BOOK_LOADING":
+        return {
+          ...state,
+          isLoadingBooks: action.payload,
+        };
+    
     default:
       return state;
   }

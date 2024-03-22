@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
@@ -8,6 +8,7 @@ import {
   Text,
   TextInput,
   View,
+  ActivityIndicator
 } from "react-native";
 import BookCount from "../components/BookCount";
 import { Ionicons } from "@expo/vector-icons";
@@ -68,7 +69,8 @@ class HomeScreen extends React.Component {
           // booksReading: Books.filter((item) => item.read == false),
         }));
         this.props.loadBooks(Books.reverse())
-        console.log(this.props.books)
+        this.props.toggleIsLoadingBook(false)
+
       }
     } catch (e) {
       alert(e);
@@ -106,6 +108,7 @@ class HomeScreen extends React.Component {
   };
 
   addBook = async (book) => {
+    this.props.toggleIsLoadingBook(true);
     this.setState({
       textInput:''
     })
@@ -145,6 +148,7 @@ class HomeScreen extends React.Component {
         // );
 
          this.props.addBook({name:book,read: false})
+         this.props.toggleIsLoadingBook(false)
 
 } catch (e) {
         alert(e);
@@ -154,6 +158,8 @@ class HomeScreen extends React.Component {
 
   markAsRead = async (selectedBook, index) => {
     try {
+      this.props.toggleIsLoadingBook(true);
+
       const dbRef = ref(getDatabase());
       const updates = {};
       updates[
@@ -185,6 +191,7 @@ class HomeScreen extends React.Component {
     //   // readingCount: prevState.readingCount - 1,
     // }));
     this.props.markBookAsRead(selectedBook)
+    this.props.toggleIsLoadingBook(false)
 
     
   };
@@ -226,7 +233,7 @@ class HomeScreen extends React.Component {
       <View style={styles.container}>
         <SafeAreaView />
         {/* <View style={styles.header}> */}
-          {/* <Text style={styles.headerTitle}> Book Worm</Text> */}
+        {/* <Text style={styles.headerTitle}> Book Worm</Text> */}
         {/* </View> */}
         <View style={styles.container}>
           {/* {this.state.isAddNewBookVisible && (
@@ -259,6 +266,19 @@ class HomeScreen extends React.Component {
               </CustomActionButton>
             </View>
           )} */}
+          {this.props.books.isLoadingBooks && (
+            <View
+              style={{
+                ...StyleSheet.absoluteFill,
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1000,
+                elevation: 1000,
+              }}
+            >
+              <ActivityIndicator size={"large"} color={colors.logColor} />
+            </View>
+          )}
           <View style={styles.textInputContainer}>
             <TextInput
               style={styles.textInput}
@@ -267,14 +287,16 @@ class HomeScreen extends React.Component {
               onChangeText={(text) => {
                 this.setState({ textInputData: text });
               }}
-
-              ref={component => {this.textInputRef= component}}            />
+              ref={(component) => {
+                this.textInputRef = component;
+              }}
+            />
           </View>
           <FlatList
-        data={this.props.books.books}    
-        renderItem={({ item, index }) => this.renderItem(item, index)}
+            data={this.props.books.books}
+            renderItem={({ item, index }) => this.renderItem(item, index)}
             keyExtractor={(item, index) => index.toString()}
-            ListEmptyComponent={
+            ListEmptyComponent={!this.props.books.isLoadingBooks  ? null :
               <View style={styles.listEmptyComponent}>
                 <Text style={styles.listEmptyComponentText}>
                   Not Reading any Books.
@@ -292,9 +314,9 @@ class HomeScreen extends React.Component {
             <CustomActionButton
               position={"right"}
               style={styles.addNewBookButton}
-              onPress={()=>{
+              onPress={() => {
                 this.addBook(this.state.textInputData);
-                }}
+              }}
             >
               <Text style={styles.addNewBookText}>+</Text>
             </CustomActionButton>
@@ -319,7 +341,7 @@ class HomeScreen extends React.Component {
 
 const mapStateToProps = state => {
   return {
-  books: state.books
+  books: state.books,
   }
 }
 
@@ -332,6 +354,9 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({ type: "ADD_BOOK", payload: books }),
       markBookAsRead: (book) =>
       dispatch({ type: "MARK_BOOK_AS_READ", payload: book }),
+      toggleIsLoadingBook: (bool) =>
+      dispatch({ type: "TOGGLE_IS_BOOK_LOADING", payload: bool }),
+
 
   };
 };

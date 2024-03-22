@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import React from "react";
 import colors from "../../assets/color";
-import { FlatList, StyleSheet, View, Text } from "react-native";
+import { FlatList, StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import ListItem from "../../components/ListItem";
 import { connect } from "react-redux";
 
@@ -20,11 +20,25 @@ class BooksReadScreen extends React.Component {
           backgroundColor: colors.bgMain,
         }}
       >
+        {this.props.books.isLoadingBooks && (
+          <View
+            style={{
+              ...StyleSheet.absoluteFill,
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              elevation: 1000,
+            }}
+          >
+            <ActivityIndicator size={"large"} color={colors.logColor} />
+          </View>
+        )}
+
         <FlatList
           data={this.props.books.booksRead}
           renderItem={({ item, index }) => this.renderItem(item, index)}
           keyExtractor={(item, index) => index.toString()}
-          ListEmptyComponent={
+          ListEmptyComponent={!this.props.books.isLoadingBooks  ? null :
             <View style={styles.listEmptyComponent}>
               <Text style={styles.listEmptyComponentText}>
                 Not Reading any Books.
