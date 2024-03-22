@@ -15,6 +15,7 @@ import SettingScreen from "./AppSwitchNavigator/SettingScreen";
 import CustomDrawerCompoenent from "./screens/DrawerNavigator/CustomDrawerCompoenent";
 import LoadingScreen from "./screens/LoadingScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import BookCountCointainers from "./redux/containers/BookCountCointainers";
 export default class BookWorm extends React.Component {
   render() {
     const Stack = createStackNavigator();
@@ -40,15 +41,18 @@ export default class BookWorm extends React.Component {
               title:"Total Books",
               tabBarLabel: "Total Books",
               headerShown: false,
+              tabBarIcon:({tintColor})=><BookCountCointainers  color={tintColor} type={'books'} /> 
+              
             }}
           />
-
           <HomeTabNavigator.Screen
             name="BooksReadScreen"
             component={BooksReadScreen}
             options={{
               tabBarLabel: "Books Read",
               headerShown: false,
+              tabBarIcon:({tintColor})=><BookCountCointainers  color={tintColor} type={'booksRead'} /> 
+
             }}
           />
 
@@ -59,6 +63,8 @@ export default class BookWorm extends React.Component {
 
               tabBarLabel: "Books Reading",
               headerShown: false,
+              tabBarIcon:({tintColor})=><BookCountCointainers  color={tintColor} type={'booksReading'}/> 
+
             }}
           />
         </HomeTabNavigator.Navigator>

@@ -31,6 +31,10 @@ const booksReducers = (state = initialState, action) => {
           }
           return book;
         }),
+        booksRead: [...state.booksRead, action.payload],
+        booksReading: state.books.filter(
+          (book) => book.name !== action.payload.name
+        ),
       };
     default:
       return state;

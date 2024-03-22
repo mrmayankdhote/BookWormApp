@@ -5,6 +5,9 @@ import { firebaseConfig } from "./config/config";
 import * as firebase from "firebase/app";
 import { initializeAuth, getReactNativePersistence  } from "firebase/auth";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import BookCountCointainers from "./redux/containers/BookCountCointainers";
 
 
 class App extends React.Component {
@@ -13,7 +16,11 @@ class App extends React.Component {
     this.initializeFirebase();
   }
   render() {
-    return <BookWorm />;
+    return (
+      <Provider store={store}>
+        <BookWorm />
+      </Provider>
+    );
   }
 
   initializeFirebase = () => {
