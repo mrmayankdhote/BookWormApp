@@ -8,6 +8,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import BookCountCointainers from "./redux/containers/BookCountCointainers";
+import { ActionSheetProvider   } from "@expo/react-native-action-sheet";
 
 
 class App extends React.Component {
@@ -18,7 +19,9 @@ class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <BookWorm />
+        <ActionSheetProvider>
+          <BookWorm />
+        </ActionSheetProvider>
       </Provider>
     );
   }

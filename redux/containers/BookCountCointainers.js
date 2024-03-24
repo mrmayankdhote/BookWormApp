@@ -12,7 +12,7 @@ const BookCountCointainers = ({ color, type,...props }) => (
         color: color,
       }}
     >
-      {props.books[type].length || 0}
+      {props?.books[type]?.length || 0}
     </Text>
   </View>
 );

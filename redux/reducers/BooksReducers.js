@@ -23,6 +23,18 @@ const booksReducers = (state = initialState, action) => {
         books: [action.payload, ...state.books],
         booksReading: [action.payload, ...state.booksReading],
       };
+    case "DELETE_BOOK":
+      return {
+        books:  state.books.filter(
+          (book) => book.name !== action.payload.name
+        ),
+        booksReading:  state.books.filter(
+          (book) => book.name !== action.payload.name
+        ),
+        booksRead: state.books.filter(
+          (book) => book.name !== action.payload.name
+        )
+      };
     case "MARK_BOOK_AS_READ":
       return {
         ...state,
@@ -37,15 +49,31 @@ const booksReducers = (state = initialState, action) => {
           (book) => book.name !== action.payload.name
         ),
       };
-      case "TOGGLE_IS_BOOK_LOADING":
-        return {
-          ...state,
-          isLoadingBooks: action.payload,
-        };
-    
+    case "MARK_BOOK_AS_UNREAD":
+      return {
+        ...state,
+        books: state.books.map((book) => {
+          if (book.name == action.payload.name) {
+            return { ...book, read: false };
+          }
+          return book;
+        }),
+        booksReading: [...state.booksRead, action.payload],
+        booksRead: state.books.filter(
+          (book) => book.name !== action.payload.name
+        ),
+      };
+    case "TOGGLE_IS_BOOK_LOADING":
+      return {
+        ...state,
+        isLoadingBooks: action.payload,
+      };
+
     default:
       return state;
   }
+  
+  
 };
 
 export default booksReducers;

@@ -15,12 +15,13 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomActionButton from "../components/CustomActionButton";
 import colors from "../assets/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getDatabase, ref, get,setKey, set, child, push, query, orderByChild, equalTo, update } from "firebase/database";
+import { getDatabase, ref, get,setKey, set, child, push, query, orderByChild, equalTo, update, remove } from "firebase/database";
 import { snapshotToArray } from "../helpers/firebaseHelpers";
 import { bool } from "prop-types";
 import ListItem from "../components/ListItem";
 import * as Animatable from 'react-native-animatable'
 import { connect } from "react-redux";
+import Swipeout from "react-native-swipeout";
 
 class HomeScreen extends React.Component {
   constructor() {
@@ -68,11 +69,14 @@ class HomeScreen extends React.Component {
           // booksRead: Books.filter((item) => item.read == true),
           // booksReading: Books.filter((item) => item.read == false),
         }));
-        this.props.loadBooks(Books.reverse())
+        this.props.loadBooks(Books?.reverse())
         this.props.toggleIsLoadingBook(false)
 
       }
+      this.props.toggleIsLoadingBook(false)
+
     } catch (e) {
+      this.props.toggleIsLoadingBook(false)
       alert(e);
     }
   };
@@ -116,6 +120,8 @@ class HomeScreen extends React.Component {
     const isBookAlreadyExist = await this.getData(book);
     if (isBookAlreadyExist) {
       alert("Unable to add as book already exists");
+      this.props.toggleIsLoadingBook(false);
+
     } else {
       try {
         const db = getDatabase();
@@ -195,7 +201,69 @@ class HomeScreen extends React.Component {
 
     
   };
-  renderItem = (item, index) => (
+
+  markAsUnRead = async (selectedBook, index) => {
+    try {
+      this.props.toggleIsLoadingBook(true);
+
+      const dbRef = ref(getDatabase());
+      const updates = {};
+      updates[
+        `Book/${this.state.currentUser?.uid}/${selectedBook?.key}/read`
+      ] = false;
+      await update(dbRef, updates);
+    } catch (e) {
+      console.log("markAsRead method error" + e);
+    }
+
+    // let newList = this.state.books.map((book) => {
+    //   if (book.name == selectedBook.name) {
+    //     return { ...book, read: false };
+    //   } else return book;
+    // });
+
+    // let newBooksReadingList = this.state.booksReading.filter(
+    //   (book) => book.name != selectedBook.name
+    // );
+
+    // this.setState((prevState) => ({
+    //   books: newList,
+    //   booksReading: newBooksReadingList,
+    //   booksRead: [
+    //     ...prevState.booksRead,
+    //     { name: selectedBook.name, read: true },
+    //   ],
+    //   // readCount: prevState.readCount + 1,
+    //   // readingCount: prevState.readingCount - 1,
+    // }));
+    alert(selectedBook)
+    this.props.markBookAsUNRead(selectedBook)
+    this.props.toggleIsLoadingBook(false)
+
+    
+  };
+
+  deleteBook = async (selectedBook, index) => {
+    try {
+      this.props.toggleIsLoadingBook(true);
+
+      const dbRef = ref(getDatabase());
+      await remove(dbRef, `Book/${this.state.currentUser?.uid}/${selectedBook?.key}`)
+      this.props.deleteBook(selectedBook);
+      this.props.toggleIsLoadingBook(false);
+
+    } catch (e) {
+      alert("deleteBook error" + e);
+    }
+
+    this.props.deleteBook(selectedBook)
+    this.props.toggleIsLoadingBook(false)
+
+    
+  };
+
+
+  renderItem = (item, index) => {
     // <View style={{  flexDirection: "row",backgroundColor:colors.listItemBg ,minHeight: 100,alignItems:'center',marginVertical:5}}>
     // <View style={styles.imageContainer}>
     // <Image source={require('../assets/icon.png')}  style={styles.image} />
@@ -214,19 +282,102 @@ class HomeScreen extends React.Component {
     //     </CustomActionButton>
     //   )}
     // </View>
-    <ListItem item={item}>
-      {item.read == true ? (
-        <Ionicons name="checkmark" color={colors.logColor} size={30} />
-      ) : (
-        <CustomActionButton
-          onPress={() => this.markAsRead(item, index)}
-          style={styles.markAsReadButton}
-        >
-          <Text style={styles.markasReadText}>Mark as Read.</Text>
-        </CustomActionButton>
-      )}
-    </ListItem>
-  );
+
+    let swipeoutButtons = [
+      !item.read
+        ? {
+            text: "Mark read",
+            component: (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize:14,
+                  }}
+                >
+                  Mark read
+                </Text>
+              </View>
+            ),
+            backgroundColor: colors.bgSuccess,
+            onPress: () => {
+              this.markAsRead(item,index)
+            },
+          }
+        : {
+            text: "Mark as unread",
+            backgroundColor: colors.bgUnread,
+            component: (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize:14,
+                  }}
+                >
+                  Mark Unread
+                </Text>
+              </View>
+            ),
+            onPress: () => {
+              this.markAsUnRead(item,index)
+            },
+          },
+      {
+        text: "Delete",
+        component: (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Ionicons name="trash-bin" size={24} color={colors.white} />
+          </View>
+        ),
+        backgroundColor: colors.bgDelete,
+        onPress: () => {
+          this.deleteBook(item,index);
+        },
+      },
+    ];
+
+
+return  (
+<Swipeout
+autoClose={true}
+backgroundColor={colors.bgMain}
+right={swipeoutButtons}
+ >
+
+<ListItem item={item} marginVertical={0} editabled={true}>
+  {item.read == true ? (
+    <Ionicons name="checkmark" color={colors.logColor} size={30} />
+  ) : (
+    <CustomActionButton
+      onPress={() => this.markAsRead(item, index)}
+      style={styles.markAsReadButton}
+    >
+      <Text style={styles.markasReadText}>Mark as Read.</Text>
+    </CustomActionButton>
+  )}
+</ListItem>
+</Swipeout>)
+  };
+  
 
   render() {
     return (
@@ -356,7 +507,11 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({ type: "MARK_BOOK_AS_READ", payload: book }),
       toggleIsLoadingBook: (bool) =>
       dispatch({ type: "TOGGLE_IS_BOOK_LOADING", payload: bool }),
-
+      markBookAsUNRead: (book) =>
+      dispatch({ type: "MARK_BOOK_AS_UNREAD", payload: book }),
+      deleteBook: (book) =>
+      dispatch({ type: "DELETE_BOOK", payload: book })
+      
 
   };
 };

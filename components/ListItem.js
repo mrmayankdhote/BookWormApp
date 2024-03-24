@@ -1,10 +1,10 @@
 import React from "react";
-import { View, StyleSheet, Image, Text } from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity, Alert } from "react-native";
 import colors from "../assets/color";
 import { Ionicons } from "@expo/vector-icons";
 import CustomActionButton from "../components/CustomActionButton";
 
-const ListItem = ({ item, children }) => {
+const ListItem = ({ item, children,editabled }) => {
   return (
     <View
       style={{
@@ -16,7 +16,13 @@ const ListItem = ({ item, children }) => {
       }}
     >
       <View style={styles.imageContainer}>
+      <TouchableOpacity
+      disabled={!editabled}
+      style={{
+        flex:1,
+      }} onPress={()=>{alert('action')}}>
         <Image source={require("../assets/icon.png")} style={styles.image} />
+        </TouchableOpacity>
       </View>
       <View style={styles.markAsReadContainer}>
         <Text style={styles.listItemTitle}>{item.name}</Text>
@@ -26,6 +32,9 @@ const ListItem = ({ item, children }) => {
   );
 };
 
+ListItem.defaultProps = {
+  marginVertical:5,
+};
 export default ListItem;
 const styles = StyleSheet.create({
   container: {
